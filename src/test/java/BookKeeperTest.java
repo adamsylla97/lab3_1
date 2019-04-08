@@ -131,4 +131,65 @@ public class BookKeeperTest {
 
     }
 
+    @Test
+    public void invoiceRequestShouldCallProductDataGetTypeTwoTimesOnceForEveryProductTypeTest(){
+
+        BookKeeper bookKeeper = new BookKeeper(new InvoiceFactory());
+        ClientData clientData = new ClientData(Id.generate(),"client");
+        InvoiceRequest invoiceRequest = new InvoiceRequest(clientData);
+
+        Money money1 = new Money(3);
+        Money money2 = new Money(5);
+
+        TaxPolicy taxPolicy1 = mock(TaxPolicy.class);
+        when(taxPolicy1.calculateTax(ProductType.STANDARD, money1)).thenReturn(new Tax(new Money(0.23),"23%"));
+        when(taxPolicy1.calculateTax(ProductType.FOOD,money2)).thenReturn(new Tax(new Money(0.46),"46%"));
+
+        ProductData productData1 = mock(ProductData.class);
+        when(productData1.getType()).thenReturn(ProductType.STANDARD);
+
+        ProductData productData2 = mock(ProductData.class);
+        when(productData2.getType()).thenReturn(ProductType.FOOD);
+
+        RequestItem requestItem1 = new RequestItem(productData1, 5, new Money(3));
+        invoiceRequest.add(requestItem1);
+
+        RequestItem requestItem2 = new RequestItem(productData2, 2, new Money(5));
+        invoiceRequest.add(requestItem2);
+
+        Invoice invoice = bookKeeper.issuance(invoiceRequest,taxPolicy1);
+
+        Mockito.verify(productData1, times(1)).getType();
+        Mockito.verify(productData2, times(1)).getType();
+
+    }
+
+    @Test
+    public void invoiceRequestShouldCallRequestItemGetTotalCostTwoTimesTest(){
+
+        BookKeeper bookKeeper = new BookKeeper(new InvoiceFactory());
+        ClientData clientData = new ClientData(Id.generate(),"client");
+        InvoiceRequest invoiceRequest = new InvoiceRequest(clientData);
+
+        Money money1 = new Money(3);
+
+        TaxPolicy taxPolicy1 = mock(TaxPolicy.class);
+        when(taxPolicy1.calculateTax(ProductType.STANDARD, money1)).thenReturn(new Tax(new Money(0.23),"23%"));
+
+        ProductData productData1 = mock(ProductData.class);
+        when(productData1.getType()).thenReturn(ProductType.STANDARD);
+
+        RequestItem requestItem1 = mock(RequestItem.class);
+        when(requestItem1.getTotalCost()).thenReturn(new Money(3));
+        when(requestItem1.getProductData()).thenReturn(productData1);
+        when(requestItem1.getQuantity()).thenReturn(5);
+        invoiceRequest.add(requestItem1);
+        invoiceRequest.add(requestItem1);
+
+        Invoice invoice = bookKeeper.issuance(invoiceRequest,taxPolicy1);
+
+        verify(requestItem1,times(2)).getTotalCost();
+
+    }
+
 }
