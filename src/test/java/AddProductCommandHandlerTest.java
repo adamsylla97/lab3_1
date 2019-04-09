@@ -42,7 +42,7 @@ public class AddProductCommandHandlerTest {
         when(product.isAvailable()).thenReturn(true);
 
         reservationRepository = mock(ReservationRepository.class);
-        when(reservationRepository.load(any())).thenReturn(reservation);
+        when(reservationRepository.load(new Id("1"))).thenReturn(reservation);
 
         productRepository = mock(ProductRepository.class);
         when(productRepository.load(any())).thenReturn(product);
@@ -86,6 +86,20 @@ public class AddProductCommandHandlerTest {
         addProductCommandHandler.handle(addProductCommand);
 
         verify(product,times(2)).isAvailable();
+
+    }
+
+    @Test
+    public void productIsAvaibleShouldReturnTrue(){
+
+        Assert.assertTrue(product.isAvailable());
+
+    }
+
+    @Test
+    public void ReservationRepositoryShouldReturnRepositoryWithIdOne(){
+
+        Assert.assertEquals(reservation,reservationRepository.load(new Id("1")));
 
     }
 
