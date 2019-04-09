@@ -1,4 +1,5 @@
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.internal.matchers.Matches;
@@ -18,12 +19,19 @@ import static org.mockito.Mockito.*;
 
 public class BookKeeperTest {
 
+    BookKeeper bookKeeper;
+    ClientData clientData;
+    InvoiceRequest invoiceRequest;
+
+    @Before
+    public void setup() {
+        bookKeeper = new BookKeeper(new InvoiceFactory());
+        clientData = new ClientData(Id.generate(), "client");
+        invoiceRequest = new InvoiceRequest(clientData);
+    }
+
     @Test
     public void invoiceRequestWithOnePositionShouldReturnInvoiceWithOnePositionTest() {
-
-        BookKeeper bookKeeper = new BookKeeper(new InvoiceFactory());
-        ClientData clientData = new ClientData(Id.generate(), "client");
-        InvoiceRequest invoiceRequest = new InvoiceRequest(clientData);
 
         TaxPolicy taxPolicy = mock(TaxPolicy.class);
         when(taxPolicy.calculateTax(ProductType.STANDARD, new Money(3))).thenReturn(new Tax(new Money(0.23), "23%"));
@@ -43,10 +51,6 @@ public class BookKeeperTest {
     @Test
     public void invoiceRequestWithNoPositionsShouldReturnInvoiceWithZeroPositionsTest() {
 
-        BookKeeper bookKeeper = new BookKeeper(new InvoiceFactory());
-        ClientData clientData = new ClientData(Id.generate(), "client");
-        InvoiceRequest invoiceRequest = new InvoiceRequest(clientData);
-
         TaxPolicy taxPolicy = mock(TaxPolicy.class);
         when(taxPolicy.calculateTax(ProductType.STANDARD, new Money(3))).thenReturn(new Tax(new Money(0.23), "23%"));
 
@@ -58,10 +62,6 @@ public class BookKeeperTest {
 
     @Test
     public void invoiceGetItemsShouldReturnProperInformation() {
-
-        BookKeeper bookKeeper = new BookKeeper(new InvoiceFactory());
-        ClientData clientData = new ClientData(Id.generate(), "client");
-        InvoiceRequest invoiceRequest = new InvoiceRequest(clientData);
 
         TaxPolicy taxPolicy = mock(TaxPolicy.class);
         when(taxPolicy.calculateTax(ProductType.STANDARD, new Money(3))).thenReturn(new Tax(new Money(0.23), "23%"));
@@ -100,10 +100,6 @@ public class BookKeeperTest {
     @Test
     public void invoiceRequestWithTwoPositionsShouldCallCalculateTaxTwoTimesTest() {
 
-        BookKeeper bookKeeper = new BookKeeper(new InvoiceFactory());
-        ClientData clientData = new ClientData(Id.generate(), "client");
-        InvoiceRequest invoiceRequest = new InvoiceRequest(clientData);
-
         Money money1 = new Money(3);
         Money money2 = new Money(5);
 
@@ -133,10 +129,6 @@ public class BookKeeperTest {
     @Test
     public void invoiceRequestShouldCallProductDataGetTypeTwoTimesOnceForEveryProductTypeTest() {
 
-        BookKeeper bookKeeper = new BookKeeper(new InvoiceFactory());
-        ClientData clientData = new ClientData(Id.generate(), "client");
-        InvoiceRequest invoiceRequest = new InvoiceRequest(clientData);
-
         Money money1 = new Money(3);
         Money money2 = new Money(5);
 
@@ -165,10 +157,6 @@ public class BookKeeperTest {
 
     @Test
     public void invoiceRequestShouldCallRequestItemGetTotalCostTwoTimesTest() {
-
-        BookKeeper bookKeeper = new BookKeeper(new InvoiceFactory());
-        ClientData clientData = new ClientData(Id.generate(), "client");
-        InvoiceRequest invoiceRequest = new InvoiceRequest(clientData);
 
         Money money1 = new Money(3);
 
