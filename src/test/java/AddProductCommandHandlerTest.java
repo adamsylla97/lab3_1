@@ -79,4 +79,14 @@ public class AddProductCommandHandlerTest {
 
     }
 
+    @Test
+    public void productIsAvaibleShouldBeCalledTwoTimesTest(){
+
+        addProductCommandHandler.handle(addProductCommand);
+        addProductCommandHandler.handle(addProductCommand);
+
+        verify(product,times(2)).isAvailable();
+
+    }
+
 }
