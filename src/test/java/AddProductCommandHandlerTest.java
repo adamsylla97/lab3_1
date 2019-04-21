@@ -8,15 +8,11 @@ import pl.com.bottega.ecommerce.sales.application.api.command.AddProductCommandB
 import pl.com.bottega.ecommerce.sales.application.api.handler.AddProductCommandHandler;
 import pl.com.bottega.ecommerce.sales.application.api.handler.AddProductCommandHandlerBuilder;
 import pl.com.bottega.ecommerce.sales.domain.client.Client;
-import pl.com.bottega.ecommerce.sales.domain.client.ClientRepository;
 import pl.com.bottega.ecommerce.sales.domain.equivalent.SuggestionService;
 import pl.com.bottega.ecommerce.sales.domain.productscatalog.Product;
 import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductRepository;
-import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductType;
 import pl.com.bottega.ecommerce.sales.domain.reservation.Reservation;
 import pl.com.bottega.ecommerce.sales.domain.reservation.ReservationRepository;
-import pl.com.bottega.ecommerce.sharedkernel.Money;
-import pl.com.bottega.ecommerce.system.application.SystemContext;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -28,8 +24,6 @@ public class AddProductCommandHandlerTest {
     private ReservationRepository reservationRepository;
     private ProductRepository productRepository;
     private SuggestionService suggestionService;
-    //private ClientRepository clientRepository;
-    //private SystemContext systemContext;
     private Product product;
     private Reservation reservation;
     private Client client;
@@ -53,10 +47,8 @@ public class AddProductCommandHandlerTest {
         productRepository = mock(ProductRepository.class);
         when(productRepository.load(any())).thenReturn(product);
 
-        //systemContext = mock(SystemContext.class);
-
         suggestionService = mock(SuggestionService.class);
-        when(suggestionService.suggestEquivalent(product,client)).thenReturn(product);
+        when(suggestionService.suggestEquivalent(product, client)).thenReturn(product);
 
         AddProductCommandHandlerBuilder addProductCommandHandlerBuilder = new AddProductCommandHandlerBuilder();
         addProductCommandHandlerBuilder.withReservationRepository(reservationRepository);
@@ -71,12 +63,12 @@ public class AddProductCommandHandlerTest {
         addProductCommandHandler.handle(addProductCommand);
         addProductCommandHandler.handle(addProductCommand);
 
-        verify(reservationRepository,Mockito.times(2)).load(new Id("1"));
+        verify(reservationRepository, Mockito.times(2)).load(new Id("1"));
 
     }
 
     @Test
-    public void productRepositoryLoadShouldBeCalledThreeTimesTest(){
+    public void productRepositoryLoadShouldBeCalledThreeTimesTest() {
 
         addProductCommandHandler.handle(addProductCommand);
         addProductCommandHandler.handle(addProductCommand);
@@ -84,43 +76,43 @@ public class AddProductCommandHandlerTest {
 
         when(reservationRepository.load(new Id("1"))).thenReturn(reservation);
 
-        verify(productRepository,times(3)).load(new Id("1"));
+        verify(productRepository, times(3)).load(new Id("1"));
 
     }
 
     @Test
-    public void productIsAvaibleShouldBeCalledTwoTimesTest(){
+    public void productIsAvaibleShouldBeCalledTwoTimesTest() {
 
         addProductCommandHandler.handle(addProductCommand);
         addProductCommandHandler.handle(addProductCommand);
 
-        verify(product,times(2)).isAvailable();
+        verify(product, times(2)).isAvailable();
 
     }
 
-//    @Test
-//    public void suggestionServiceSuggestEquivalentShouldBeCalledOneTime(){
-//
-//        addProductCommandHandler.handle(addProductCommand);
-//
-//        when(suggestionService.suggestEquivalent(product,client)).thenReturn(null);
-//        when(product.isAvailable()).thenReturn(false);
-//
-//        verify(suggestionService,atLeastOnce()).suggestEquivalent(any(Product.class),any(Client.class));
-//
-//    }
+    //    @Test
+    //    public void suggestionServiceSuggestEquivalentShouldBeCalledOneTime(){
+    //
+    //        addProductCommandHandler.handle(addProductCommand);
+    //
+    //        when(suggestionService.suggestEquivalent(product,client)).thenReturn(null);
+    //        when(product.isAvailable()).thenReturn(false);
+    //
+    //        verify(suggestionService,atLeastOnce()).suggestEquivalent(any(Product.class),any(Client.class));
+    //
+    //    }
 
     @Test
-    public void productIsAvaibleShouldReturnTrue(){
+    public void productIsAvaibleShouldReturnTrue() {
 
         Assert.assertTrue(product.isAvailable());
 
     }
 
     @Test
-    public void ReservationRepositoryShouldReturnRepositoryWithIdOne(){
+    public void ReservationRepositoryShouldReturnRepositoryWithIdOne() {
 
-        Assert.assertEquals(reservation,reservationRepository.load(new Id("1")));
+        Assert.assertEquals(reservation, reservationRepository.load(new Id("1")));
 
     }
 
