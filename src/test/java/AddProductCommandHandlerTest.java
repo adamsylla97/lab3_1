@@ -90,6 +90,18 @@ public class AddProductCommandHandlerTest {
     }
 
     @Test
+    public void suggestionServiceSuggestEquivalentShouldBeCalledOneTime(){
+
+        addProductCommandHandler.handle(addProductCommand);
+
+        when(suggestionService.suggestEquivalent(product,client)).thenReturn(null);
+        when(product.isAvailable()).thenReturn(false);
+
+        verify(suggestionService,atLeastOnce()).suggestEquivalent(any(Product.class),any(Client.class));
+
+    }
+
+    @Test
     public void productIsAvaibleShouldReturnTrue(){
 
         Assert.assertTrue(product.isAvailable());
