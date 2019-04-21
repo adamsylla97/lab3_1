@@ -17,7 +17,7 @@ public class AddProductCommandBuilder {
     }
 
     public AddProductCommandBuilder withProductId(Id id){
-        this.productId = Id.generate();
+        this.productId = id;
         return this;
     }
 
