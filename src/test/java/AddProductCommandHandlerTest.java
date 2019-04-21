@@ -6,6 +6,7 @@ import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.Id;
 import pl.com.bottega.ecommerce.sales.application.api.command.AddProductCommand;
 import pl.com.bottega.ecommerce.sales.application.api.command.AddProductCommandBuilder;
 import pl.com.bottega.ecommerce.sales.application.api.handler.AddProductCommandHandler;
+import pl.com.bottega.ecommerce.sales.application.api.handler.AddProductCommandHandlerBuilder;
 import pl.com.bottega.ecommerce.sales.domain.client.Client;
 import pl.com.bottega.ecommerce.sales.domain.client.ClientRepository;
 import pl.com.bottega.ecommerce.sales.domain.equivalent.SuggestionService;
@@ -27,8 +28,8 @@ public class AddProductCommandHandlerTest {
     private ReservationRepository reservationRepository;
     private ProductRepository productRepository;
     private SuggestionService suggestionService;
-    private ClientRepository clientRepository;
-    private SystemContext systemContext;
+    //private ClientRepository clientRepository;
+    //private SystemContext systemContext;
     private Product product;
     private Reservation reservation;
     private Client client;
@@ -52,13 +53,16 @@ public class AddProductCommandHandlerTest {
         productRepository = mock(ProductRepository.class);
         when(productRepository.load(any())).thenReturn(product);
 
-        systemContext = mock(SystemContext.class);
+        //systemContext = mock(SystemContext.class);
 
         suggestionService = mock(SuggestionService.class);
         when(suggestionService.suggestEquivalent(product,client)).thenReturn(product);
 
-        addProductCommandHandler = new AddProductCommandHandler(reservationRepository, productRepository, suggestionService,
-                clientRepository, systemContext);
+        AddProductCommandHandlerBuilder addProductCommandHandlerBuilder = new AddProductCommandHandlerBuilder();
+        addProductCommandHandlerBuilder.withReservationRepository(reservationRepository);
+        addProductCommandHandlerBuilder.withProductRepository(productRepository);
+        addProductCommandHandlerBuilder.withSuggestionService(suggestionService);
+        addProductCommandHandler = addProductCommandHandlerBuilder.build();
     }
 
     @Test
