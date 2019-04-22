@@ -8,6 +8,7 @@ import pl.com.bottega.ecommerce.sales.application.api.command.AddProductCommandB
 import pl.com.bottega.ecommerce.sales.application.api.handler.AddProductCommandHandler;
 import pl.com.bottega.ecommerce.sales.application.api.handler.AddProductCommandHandlerBuilder;
 import pl.com.bottega.ecommerce.sales.domain.client.Client;
+import pl.com.bottega.ecommerce.sales.domain.client.ClientRepository;
 import pl.com.bottega.ecommerce.sales.domain.equivalent.SuggestionService;
 import pl.com.bottega.ecommerce.sales.domain.productscatalog.Product;
 import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductRepository;
@@ -25,8 +26,10 @@ public class AddProductCommandHandlerTest {
     private ProductRepository productRepository;
     private SuggestionService suggestionService;
     private Product product;
+    private Product product2;
     private Reservation reservation;
     private Client client;
+    private ClientRepository clientRepository;
 
     @Before
     public void setup() {
@@ -37,6 +40,12 @@ public class AddProductCommandHandlerTest {
         addProductCommand = addProductCommandBuilder.build();
 
         reservation = mock(Reservation.class);
+
+        client = mock(Client.class);
+        when(client.getId()).thenReturn(new Id("1"));
+
+        clientRepository = mock(ClientRepository.class);
+        when(clientRepository.load(new Id("1"))).thenReturn(client);
 
         product = mock(Product.class);
         when(product.isAvailable()).thenReturn(true);
@@ -54,6 +63,7 @@ public class AddProductCommandHandlerTest {
         addProductCommandHandlerBuilder.withReservationRepository(reservationRepository);
         addProductCommandHandlerBuilder.withProductRepository(productRepository);
         addProductCommandHandlerBuilder.withSuggestionService(suggestionService);
+        addProductCommandHandlerBuilder.withClientRepository(clientRepository);
         addProductCommandHandler = addProductCommandHandlerBuilder.build();
     }
 
@@ -90,17 +100,17 @@ public class AddProductCommandHandlerTest {
 
     }
 
-    //    @Test
-    //    public void suggestionServiceSuggestEquivalentShouldBeCalledOneTime(){
-    //
-    //        addProductCommandHandler.handle(addProductCommand);
-    //
-    //        when(suggestionService.suggestEquivalent(product,client)).thenReturn(null);
-    //        when(product.isAvailable()).thenReturn(false);
-    //
-    //        verify(suggestionService,atLeastOnce()).suggestEquivalent(any(Product.class),any(Client.class));
-    //
-    //    }
+    @Test
+    public void suggestionServiceSuggestEquivalentShouldBeCalledOneTime() {
+
+        when(product.isAvailable()).thenReturn(false);
+        when(suggestionService.suggestEquivalent(product, client)).thenReturn(product2);
+
+        addProductCommandHandler.handle(addProductCommand);
+
+        verify(suggestionService).suggestEquivalent(product, client);
+
+    }
 
     @Test
     public void productIsAvaibleShouldReturnTrue() {
