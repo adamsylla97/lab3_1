@@ -48,19 +48,18 @@ public class AddProductCommandHandlerTest {
         addProductCommandBuilder.withQuantity(5);
         addProductCommand = addProductCommandBuilder.build();
 
-        clientData = new ClientData(new Id("1"),"client");
+        clientData = new ClientData(new Id("1"), "client");
         reservationStatus = Reservation.ReservationStatus.OPENED;
 
         reservation = new Reservation(new Id("1"), reservationStatus, clientData, new Date());
 
         client = new Client();
 
-
         clientRepository = mock(ClientRepository.class);
         when(clientRepository.load(new Id("1"))).thenReturn(client);
 
-        product = new Product(new Id("1"),new Money(122),"product", ProductType.STANDARD);
-        product2 = new Product(new Id("2"), new Money(111),"product2",ProductType.STANDARD);
+        product = new Product(new Id("1"), new Money(122), "product", ProductType.STANDARD);
+        product2 = new Product(new Id("2"), new Money(111), "product2", ProductType.STANDARD);
 
         reservationRepository = mock(ReservationRepository.class);
         when(reservationRepository.load(new Id("1"))).thenReturn(reservation);
@@ -102,16 +101,6 @@ public class AddProductCommandHandlerTest {
 
     }
 
-//    @Test
-//    public void productIsAvaibleShouldBeCalledTwoTimesTest() {
-//
-//        addProductCommandHandler.handle(addProductCommand);
-//       // addProductCommandHandler.handle(addProductCommand);
-//
-//        verify(product, times(2)).isAvailable();
-//
-//    }
-
     @Test
     public void suggestionServiceSuggestEquivalentShouldBeCalledOneTime() {
 
@@ -134,9 +123,7 @@ public class AddProductCommandHandlerTest {
     public void ReservationRepositoryShouldReturnRepositoryWithIdOne() {
 
         addProductCommandHandler.handle(addProductCommand);
-
         verify(reservationRepository).save(captor.capture());
-
         Assert.assertEquals(reservation, captor.getValue());
 
     }
