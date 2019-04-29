@@ -22,24 +22,39 @@ public class BookKeeperTest {
     BookKeeper bookKeeper;
     ClientData clientData;
     InvoiceRequest invoiceRequest;
+    TaxPolicy taxPolicy;
+    ProductData productData;
+    ProductData productData2;
+    Money money1;
+    Money money2;
 
     @Before
     public void setup() {
         bookKeeper = new BookKeeper(new InvoiceFactory());
         clientData = new ClientData(Id.generate(), "client");
         invoiceRequest = new InvoiceRequest(clientData);
+
+        taxPolicy = mock(TaxPolicy.class);
+        when(taxPolicy.calculateTax(ProductType.STANDARD, money1)).thenReturn(new Tax(new Money(0.23), "23%"));
+        when(taxPolicy.calculateTax(ProductType.FOOD, money2)).thenReturn(new Tax(new Money(0.46), "46%"));
+
+        productData = mock(ProductData.class);
+        when(productData.getType()).thenReturn(ProductType.STANDARD);
+        when(productData.getName()).thenReturn("product1");
+
+        productData2 = mock(ProductData.class);
+        when(productData2.getType()).thenReturn(ProductType.FOOD);
+        when(productData2.getName()).thenReturn("product2");
+
+        money1 = new Money(3);
+        money2 = new Money(5);
+
     }
 
     @Test
     public void invoiceRequestWithOnePositionShouldReturnInvoiceWithOnePositionTest() {
 
-        TaxPolicy taxPolicy = mock(TaxPolicy.class);
-        when(taxPolicy.calculateTax(ProductType.STANDARD, new Money(3))).thenReturn(new Tax(new Money(0.23), "23%"));
-
-        ProductData productData = mock(ProductData.class);
-        when(productData.getType()).thenReturn(ProductType.STANDARD);
-
-        RequestItem requestItem = new RequestItem(productData, 5, new Money(3));
+        RequestItem requestItem = new RequestItem(productData, 5, money1);
         invoiceRequest.add(requestItem);
 
         Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
@@ -51,9 +66,6 @@ public class BookKeeperTest {
     @Test
     public void invoiceRequestWithNoPositionsShouldReturnInvoiceWithZeroPositionsTest() {
 
-        TaxPolicy taxPolicy = mock(TaxPolicy.class);
-        when(taxPolicy.calculateTax(ProductType.STANDARD, new Money(3))).thenReturn(new Tax(new Money(0.23), "23%"));
-
         Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
 
         Assert.assertThat(invoice.getItems().size(), is(equalTo(0)));
@@ -63,20 +75,8 @@ public class BookKeeperTest {
     @Test
     public void invoiceGetItemsShouldReturnProperInformation() {
 
-        TaxPolicy taxPolicy = mock(TaxPolicy.class);
-        when(taxPolicy.calculateTax(ProductType.STANDARD, new Money(3))).thenReturn(new Tax(new Money(0.23), "23%"));
-        when(taxPolicy.calculateTax(ProductType.FOOD, new Money(5))).thenReturn(new Tax(new Money(0.46), "46%"));
-
-        ProductData productData = mock(ProductData.class);
-        when(productData.getType()).thenReturn(ProductType.STANDARD);
-        when(productData.getName()).thenReturn("product1");
-
-        ProductData productData2 = mock(ProductData.class);
-        when(productData2.getType()).thenReturn(ProductType.FOOD);
-        when(productData2.getName()).thenReturn("product2");
-
-        RequestItem requestItem = new RequestItem(productData, 5, new Money(3));
-        RequestItem requestItem2 = new RequestItem(productData2, 6, new Money(5));
+        RequestItem requestItem = new RequestItem(productData, 5,money1);
+        RequestItem requestItem2 = new RequestItem(productData2, 6, money2);
         invoiceRequest.add(requestItem);
         invoiceRequest.add(requestItem2);
 
@@ -100,57 +100,31 @@ public class BookKeeperTest {
     @Test
     public void invoiceRequestWithTwoPositionsShouldCallCalculateTaxTwoTimesTest() {
 
-        Money money1 = new Money(3);
-        Money money2 = new Money(5);
-
-        TaxPolicy taxPolicy1 = mock(TaxPolicy.class);
-        when(taxPolicy1.calculateTax(ProductType.STANDARD, money1)).thenReturn(new Tax(new Money(0.23), "23%"));
-        when(taxPolicy1.calculateTax(ProductType.FOOD, money2)).thenReturn(new Tax(new Money(0.46), "46%"));
-
-        ProductData productData1 = mock(ProductData.class);
-        when(productData1.getType()).thenReturn(ProductType.STANDARD);
-
-        ProductData productData2 = mock(ProductData.class);
-        when(productData2.getType()).thenReturn(ProductType.FOOD);
-
-        RequestItem requestItem1 = new RequestItem(productData1, 5, new Money(3));
+        RequestItem requestItem1 = new RequestItem(productData, 5, money1);
         invoiceRequest.add(requestItem1);
 
-        RequestItem requestItem2 = new RequestItem(productData2, 2, new Money(5));
+        RequestItem requestItem2 = new RequestItem(productData2, 2, money2);
         invoiceRequest.add(requestItem2);
 
-        Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy1);
+        Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
 
-        Mockito.verify(taxPolicy1, times(1)).calculateTax(ProductType.STANDARD, money1);
-        Mockito.verify(taxPolicy1, times(1)).calculateTax(ProductType.FOOD, money2);
+        Mockito.verify(taxPolicy, times(1)).calculateTax(ProductType.STANDARD, money1);
+        Mockito.verify(taxPolicy, times(1)).calculateTax(ProductType.FOOD, money2);
 
     }
 
     @Test
     public void invoiceRequestShouldCallProductDataGetTypeTwoTimesOnceForEveryProductTypeTest() {
 
-        Money money1 = new Money(3);
-        Money money2 = new Money(5);
-
-        TaxPolicy taxPolicy1 = mock(TaxPolicy.class);
-        when(taxPolicy1.calculateTax(ProductType.STANDARD, money1)).thenReturn(new Tax(new Money(0.23), "23%"));
-        when(taxPolicy1.calculateTax(ProductType.FOOD, money2)).thenReturn(new Tax(new Money(0.46), "46%"));
-
-        ProductData productData1 = mock(ProductData.class);
-        when(productData1.getType()).thenReturn(ProductType.STANDARD);
-
-        ProductData productData2 = mock(ProductData.class);
-        when(productData2.getType()).thenReturn(ProductType.FOOD);
-
-        RequestItem requestItem1 = new RequestItem(productData1, 5, new Money(3));
+        RequestItem requestItem1 = new RequestItem(productData, 5, money1);
         invoiceRequest.add(requestItem1);
 
-        RequestItem requestItem2 = new RequestItem(productData2, 2, new Money(5));
+        RequestItem requestItem2 = new RequestItem(productData2, 2, money2);
         invoiceRequest.add(requestItem2);
 
-        Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy1);
+        Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
 
-        Mockito.verify(productData1, times(1)).getType();
+        Mockito.verify(productData, times(1)).getType();
         Mockito.verify(productData2, times(1)).getType();
 
     }
@@ -158,22 +132,15 @@ public class BookKeeperTest {
     @Test
     public void invoiceRequestShouldCallRequestItemGetTotalCostTwoTimesTest() {
 
-        Money money1 = new Money(3);
-
-        TaxPolicy taxPolicy1 = mock(TaxPolicy.class);
-        when(taxPolicy1.calculateTax(ProductType.STANDARD, money1)).thenReturn(new Tax(new Money(0.23), "23%"));
-
-        ProductData productData1 = mock(ProductData.class);
-        when(productData1.getType()).thenReturn(ProductType.STANDARD);
 
         RequestItem requestItem1 = mock(RequestItem.class);
-        when(requestItem1.getTotalCost()).thenReturn(new Money(3));
-        when(requestItem1.getProductData()).thenReturn(productData1);
+        when(requestItem1.getTotalCost()).thenReturn(money1);
+        when(requestItem1.getProductData()).thenReturn(productData);
         when(requestItem1.getQuantity()).thenReturn(5);
         invoiceRequest.add(requestItem1);
         invoiceRequest.add(requestItem1);
 
-        Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy1);
+        Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
 
         verify(requestItem1, times(2)).getTotalCost();
 
