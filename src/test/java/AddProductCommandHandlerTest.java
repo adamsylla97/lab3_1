@@ -128,4 +128,9 @@ public class AddProductCommandHandlerTest {
 
     }
 
+    @Test
+    public void equalsTest(){
+        Assert.assertTrue(true);
+    }
+
 }
