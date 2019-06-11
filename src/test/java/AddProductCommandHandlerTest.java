@@ -133,4 +133,9 @@ public class AddProductCommandHandlerTest {
         Assert.assertTrue(true);
     }
 
+    @Test
+    public void equalsTes2t(){
+        Assert.assertTrue(true);
+    }
+
 }
