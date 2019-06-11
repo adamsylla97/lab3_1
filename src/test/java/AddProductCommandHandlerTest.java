@@ -138,4 +138,9 @@ public class AddProductCommandHandlerTest {
         Assert.assertTrue(true);
     }
 
+    @Test
+    public void anotherSUpertest(){
+        Assert.assertTrue(true);
+    }
+
 }
